@@ -72,7 +72,7 @@ public class DemandeService {
         }
     }
 
-    //chef
+    // Terminer
     @RequestMapping(path = "/supprimeDemande", method = RequestMethod.POST)
     public void deleteDemande(@RequestBody String code){
         Imprimante_d imp = imprimate_dRepository.findByCode(Long.parseLong(code));
@@ -82,6 +82,21 @@ public class DemandeService {
         }
         else imprimate_dRepository.delete(imp);
 
+    }
+
+    @RequestMapping(path = "/listerMesDemandes", method = RequestMethod.GET)
+    public List<UserRess> listerMesDemandes(Principal login){
+        List<UserRess> userRess=new ArrayList<>();
+        Utilisateur user = utilisateurRepository.findByLogin(login.getName());
+        for (Imprimante_d imp:imprimate_dRepository.findRess_d(user.getLogin())){
+            ImprimanteR impr=new ImprimanteR(imp);
+            userRess.add(new UserRess(imp.getUser().getNom() + " " + imp.getUser().getPrenom(), imp.getUser().getLogin(),imp.getCode(),"imprimante",null, impr));
+        }
+        for(Ordinateur_d ord:ordinateur_dRepository.findOrd_d(user.getLogin())){
+            OrdinateurR ordr=new OrdinateurR(ord);
+            userRess.add(new UserRess(ord.getUser().getNom() + " " + ord.getUser().getPrenom(), ord.getUser().getLogin(),ord.getCode(),"ordinateur",ordr,null));
+        }
+        return userRess;
     }
 
 //les b eng chez le chef
