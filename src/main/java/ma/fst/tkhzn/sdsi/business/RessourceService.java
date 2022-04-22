@@ -195,7 +195,7 @@ public class RessourceService {
 				List<Personnel> personnels = new ArrayList<>();
 				for(Ressource_d r: ress_by_dep.get(keydep)) {
 					if(r.getUser() == null) {
-						departement.setQuantite(r.getQteD());
+						departement.setQte(r.getQteD());
 					}
 					else {
 						Personnel personnel = new Personnel();
@@ -275,7 +275,7 @@ public class RessourceService {
 				for(Ressource_d r: ress_by_dep.get(keydep)) {
 
 					if(r.getUser() == null) {
-						departement.setQuantite(r.getQteD());
+						departement.setQte(r.getQteD());
 					}
 					else {
 						Personnel personnel = new Personnel();
