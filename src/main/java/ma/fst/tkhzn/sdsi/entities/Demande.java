@@ -14,17 +14,9 @@ import java.util.Date;
 public class Demande {
     @Id@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private int valide;
-    @ManyToOne
-    @JoinColumn(name = "id_user")
-    private Utilisateur user_dem;
-
+    private Integer valide;
+    private Integer id_appel;
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
-    private int id_appel;
-
-    public Demande(Utilisateur user_dem) {
-        this.user_dem = user_dem;
-    }
 }

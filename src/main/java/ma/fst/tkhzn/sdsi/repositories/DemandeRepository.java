@@ -17,8 +17,8 @@ public interface DemandeRepository extends JpaRepository<Demande,Integer> {
     @Query("select max(d.id) from Demande d ")
     public Integer getId();
 
-    @Query("select d from Demande d where d.valide=0")
-    public List<Demande> find();
+    @Query("select d from Demande d where d.valide = 0")
+    public Demande find();
 
     @Transactional
     @Modifying

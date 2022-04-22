@@ -79,7 +79,6 @@ public class AffectationService {
 		return affec;
 	}
 
-
 	@RequestMapping(path = "/listaffectations", method = RequestMethod.GET)
 	public ListAff addAffectation() {
 		List<Utilisateur> pers_dep=utilisateurrepository.findAll();
@@ -87,9 +86,11 @@ public class AffectationService {
 		return new ListAff(departement, pers_dep);
 	}
 
-
-//	@RequestMapping(path = "/addAffe", method = RequestMethod.POST)
-//	public void addAffe(AffectationRequest aff) {
+	@RequestMapping(path = "/addAffe", method = RequestMethod.POST)
+	public void addAffe(@RequestBody List<AffectationRequest> affs) {
+		for(AffectationRequest aff: affs) {
+			System.out.println(aff);
+		}
 //		String ressource=aff.getRessource();
 //		Ressource ress = ressourcerepository.findRess(ressource);
 //		String pers_dep=aff.getPers_dep();
@@ -97,8 +98,8 @@ public class AffectationService {
 //			for(Utilisateur u : utilisateurrepository.findBydepartement(departementRepository.findById(aff.getDep()).get())){
 //				Ressource_personnels r = new Ressource_personnels(ressource,u.getLogin(),new Date(),aff.getDep());
 //					 affectationRepository.save(r);
-//
 //				ress.setEstAffecter(true);
+//				ress.setLivrer(false);
 //				ressourcerepository.save(ress);
 //			}
 //		}
@@ -111,30 +112,9 @@ public class AffectationService {
 //			ress.setEstAffecter(true);
 //			ressourcerepository.save(ress);
 //		}
-//	}
-
-	@RequestMapping(path = "/addAffe", method = RequestMethod.POST)
-	public void addAffe(@RequestBody String code) {
-		System.out.println(code);
-//		Ressource r = ressourcerepository.findById(code);
-		Ressource r = ressourcerepository.findRess(code);
-		System.err.println(r);
-		r.setLivrer(false);
-		ressourcerepository.save(r);
 	}
-
-	@PostMapping("/api/foos")
-	public String getFoos(@RequestBody int id) { 
-		System.out.println(id * 2);
-	    return "ID: " + id;
-	}
-//	@PostMapping("/api/foos")
-//	public String getFoos(@RequestBody codes id) { 
-//		System.out.println(id.getCode());
-//	    return "ID: " + id;
-//	}
 	
-  //Modifier Affectation (clique)
+    // Modifier Affectation (clique)
   	@RequestMapping(path = "/updateAffectation", method = RequestMethod.GET)
   	public Ressource_personnels updateAffectation(String code, String login) {
 		AffectationResponse affectation = new AffectationResponse();
@@ -147,9 +127,7 @@ public class AffectationService {
   	    return aff;
   	 }
 
-
-  	//modifier Affectation (formulaire)
-  	@SuppressWarnings("null")
+  	// modifier Affectation (formulaire)
 	@RequestMapping(path = "/updateAffe", method = RequestMethod.POST)
   	public void updateAffe(AffectationRequest aff) {
 		String ressource=aff.getRessource();
@@ -170,11 +148,9 @@ public class AffectationService {
 		}
   	}
 
-
-
 	//supprimer Affectation
-		@RequestMapping(path = "/deleteAffec", method = RequestMethod.GET)
-		public void deleteAffec(AffectationRequest aff) {
+	@RequestMapping(path = "/deleteAffec", method = RequestMethod.GET)
+	public void deleteAffec(AffectationRequest aff) {
 			String ressource=aff.getRessource();
 			Ressource ress = ressourcerepository.findRess(ressource);
 			String pers_dep=aff.getPers_dep();

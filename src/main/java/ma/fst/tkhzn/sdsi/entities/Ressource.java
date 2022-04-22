@@ -27,7 +27,15 @@ public class Ressource implements Serializable{
 	private int dureeGarantie;
 	private boolean estAffecter; //1: affecter 0: nonAffecter
 	private boolean livrer;
+	private Long groupe;
 
+	public Long getGroupe() {
+		return groupe;
+	}
+
+	public void setGroupe(Long groupe) {
+		this.groupe = groupe;
+	}
 //	@ManyToMany(fetch=FetchType.EAGER)
 //	private Collection<Utilisateur> personnels=new ArrayList<>();
 
@@ -42,6 +50,7 @@ public class Ressource implements Serializable{
 		this.code = code;
 		this.dateLiv = dateLiv;
 		this.dureeGarantie = dureeGarantie;
+
 	}
 
 	public String getCode() {

@@ -13,6 +13,9 @@ import ma.fst.tkhzn.sdsi.entities.Ressource;
 
 public interface RessourceRepository extends JpaRepository<Ressource, Long>{
 
+	@Query("select max(R.groupe) from Ressource R")
+	public String findmaxGroup();
+
 	@Query("select R.code from Ressource R")
 	public List<String> findLastId();
 

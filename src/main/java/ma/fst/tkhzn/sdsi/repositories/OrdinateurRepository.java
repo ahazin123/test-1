@@ -10,5 +10,4 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface OrdinateurRepository extends JpaRepository<Ordinateur, Long>{
-
 }

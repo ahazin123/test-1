@@ -14,6 +14,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 @ToString
 public class UserRess implements Serializable {
+    private String demandeur;
+    private Long id;
     private String personnel;
     private String login;
     private Long code;

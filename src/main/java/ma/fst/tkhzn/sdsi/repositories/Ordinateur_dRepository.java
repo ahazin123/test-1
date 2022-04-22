@@ -11,6 +11,9 @@ import java.util.List;
 
 public interface Ordinateur_dRepository extends JpaRepository<Ordinateur_d,String> {
 
+    @Query("select R from Ordinateur_d R where R.dep = :x")
+    public List<Ordinateur_d> findRess_dep(@Param("x")Long dep);
+
     @Query("select R from Ordinateur_d R where R.code = :x")
     public Ordinateur_d findByCode(@Param("x")Long code);
 

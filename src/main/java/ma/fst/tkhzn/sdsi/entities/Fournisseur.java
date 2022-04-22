@@ -16,7 +16,6 @@ public class Fournisseur extends Utilisateur implements Serializable{
 	private static final long serialVersionUID = 1L;
 
 	private String mail;
-	
 	private String gerant;
 	private String lieu;
 	private String nom_socite;
