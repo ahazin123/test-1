@@ -11,6 +11,6 @@ import java.util.List;
 public class Departement_ {
     private Long id;
     private String nom;
-    private Integer quantite;
+    private Integer qte;
     private List<Personnel> personnels;
 }
