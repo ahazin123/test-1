@@ -1,5 +1,8 @@
 package ma.fst.tkhzn.sdsi.requests;
 
+import lombok.ToString;
+
+@ToString
 public class AuthenticationRequest {
 	
 	private String login;

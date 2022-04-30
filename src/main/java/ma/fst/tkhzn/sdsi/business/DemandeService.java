@@ -221,7 +221,7 @@ public class DemandeService {
         return userRess;
     }
 
-    // en cours
+    // en cours valide=1 appel d'offre courante valide=2 livrée
     @RequestMapping(path = "/addAppel", method = RequestMethod.GET)
     public void addAppel(){
         appelOffreRep.save(new AppelOffre());

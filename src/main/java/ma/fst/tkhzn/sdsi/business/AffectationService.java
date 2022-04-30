@@ -88,7 +88,17 @@ public class AffectationService {
 
 	@RequestMapping(path = "/addAffe", method = RequestMethod.POST)
 	public void addAffe(@RequestBody List<AffectationRequest> affs) {
+
 		for(AffectationRequest aff: affs) {
+			List<Ressource> ress = ressourcerepository.findByGroup(Long.valueOf(aff.getRessource()));
+			for(int i=0; i<aff.getQte(); i++) {
+				Ressource r = ress.get(i);
+				Affectation affectation = new Affectation(null, null, null, r.getCode(), new Date());
+				if(aff.getPers_dep() == null) affectation.setDepartement(aff.getDep());
+				else affectation.setPersonne(aff.getPers_dep());
+				r.setLivrer(false);
+				ressourcerepository.save(r);
+			}
 			System.out.println(aff);
 		}
 //		String ressource=aff.getRessource();

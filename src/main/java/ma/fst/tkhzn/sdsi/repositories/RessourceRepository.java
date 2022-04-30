@@ -13,6 +13,9 @@ import ma.fst.tkhzn.sdsi.entities.Ressource;
 
 public interface RessourceRepository extends JpaRepository<Ressource, Long>{
 
+	@Query("select R from Ressource R where R.livrer=true and R.groupe = :x")
+	public List<Ressource> findByGroup(@Param("x")Long group);
+
 	@Query("select max(R.groupe) from Ressource R")
 	public String findmaxGroup();
 
@@ -25,7 +28,6 @@ public interface RessourceRepository extends JpaRepository<Ressource, Long>{
 	@Query("select R from Ressource R where R.code = :x")
 	public Ressource findRess(@Param("x")String code);
 
-
 	//jamais affecter
 	@Query("select R from Ressource R where R.estAffecter=false")
     public List<Ressource> findAllLiv();
@@ -34,9 +36,8 @@ public interface RessourceRepository extends JpaRepository<Ressource, Long>{
 	@Modifying
 	@Query("delete from Ressource where code = :x")
 	public void deleteByCode(@Param("x")String code);
+
 //@Transactional
 //@Query("delete R from Ressource* R where R.code= :id")
 //public void deleteResource(@Param("id") Long code_ressource);
-	
-	
 }

@@ -103,13 +103,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().exceptionHandling()
 				.authenticationEntryPoint(authenticationEntryPoint).and()
-				.authorizeRequests((request) -> request.antMatchers("/api/auth/login").permitAll()
+				.authorizeRequests((request) -> request.antMatchers("/api/auth/login", "/api/userservice/adduser", "/ws/**").permitAll()
 					//	.antMatchers("/api/responsable/**").hasAuthority("RESPONSABLE")
-
-						.antMatchers(HttpMethod.OPTIONS, "/**").permitAll().anyRequest().authenticated())
-				.addFilterBefore(new JWTAuthenticationFilter(userService, jWTTokenHelper),
-						UsernamePasswordAuthenticationFilter.class);
-
+				.antMatchers(HttpMethod.OPTIONS, "/**").permitAll().anyRequest().authenticated())
+				.addFilterBefore(new JWTAuthenticationFilter(userService, jWTTokenHelper), UsernamePasswordAuthenticationFilter.class);
 		http.csrf().disable().cors().and().headers().frameOptions().disable();
 
 	}

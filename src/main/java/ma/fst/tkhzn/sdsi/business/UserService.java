@@ -10,6 +10,7 @@ import ma.fst.tkhzn.sdsi.entities.Fournisseur;
 import ma.fst.tkhzn.sdsi.repositories.EnseignantRepository;
 import ma.fst.tkhzn.sdsi.repositories.FournisseurRepository;
 import ma.fst.tkhzn.sdsi.requests.UserRequest;
+import ma.fst.tkhzn.sdsi.responses.CodeStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -105,20 +106,54 @@ public class UserService {
 
 
 	@RequestMapping(path = "/adduser", method = RequestMethod.POST)
-	public void addUser(UserRequest userReq) {
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-//		ens.setPwd(encoder.encode(ens.getPwd()));
-//		ens.setActive(true);
-//		ens.setNomLab(ens.getNomLab());
-//		enseignantRepository.save(ens);
-		userReq.getUser().setPwd(encoder.encode(userReq.getUser().getPwd()));
-		userReq.getUser().setActive(true);
-		if(userReq.getUser().getRole().equals("Enseignant")) {
-			enseignantRepository.save(userReq.getEnseignant());
+	public CodeStatus addUser(@RequestBody UserRequest userReq) {
+
+		String role = userReq.getRole();
+		if(role == null) {
+			return new CodeStatus(300);
+		} else {
+			if(role.equalsIgnoreCase("enseignant")) {
+				Enseignant ens = userReq.getEnseignant();
+				codePasswordAndActive(ens);
+				System.out.println(ens);
+				iUserRepository.save(ens);
+			}
+			else if(role.equalsIgnoreCase("fournisseur")) {
+				if(iUserRepository.findByLogin(userReq.getFournisseur().getLogin()) == null) {
+					Fournisseur fournisseur = userReq.getFournisseur();
+					System.out.println(fournisseur);
+					codePasswordAndActive(fournisseur);
+					System.out.println(fournisseur);
+					iUserRepository.save(fournisseur);
+				}
+				else {
+					return new CodeStatus(201);
+				}
+			}
+			else {
+				Utilisateur user = userReq.getUser();
+				codePasswordAndActive(user);
+				System.out.println(user);
+				iUserRepository.save(user);
+			}
 		}
-		iUserRepository.save(userReq.getUser());
 
+//		if(userReq.getUser().getRole().equals("Enseignant")) {
+//			Enseignant ens = userReq.getEnseignant();
+//			ens.setPwd(encoder.encode(ens.getPwd()));
+//			ens.setActive(true);
+//			ens.setNomLab(ens.getNomLab());
+//			enseignantRepository.save(ens);
+//			enseignantRepository.save(userReq.getEnseignant());
+//		}
+		return new CodeStatus(200);
+	}
 
+	private Utilisateur codePasswordAndActive(Utilisateur user) {
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		user.setPwd(encoder.encode(user.getPwd()));
+		user.setActive(true);
+		return user;
 	}
 
 	@RequestMapping(path = "/editusers", method = RequestMethod.GET)

@@ -4,13 +4,13 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.spec.InvalidKeySpecException;
 
+import ma.fst.tkhzn.sdsi.repositories.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +28,9 @@ import ma.fst.tkhzn.sdsi.responses.UserInfo;
 @RequestMapping("/api")
 @CrossOrigin
 public class AuthenticationController {
+
+	@Autowired
+	private UtilisateurRepository utilisateurRepository;
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
@@ -57,5 +60,12 @@ public class AuthenticationController {
 		response.setRole(user.getRole().toUpperCase());
 		return ResponseEntity.ok(response);
 	}
-	
+
+	@GetMapping("/auth/checklogin")
+	public boolean checkLogin(@RequestBody AuthenticationRequest login) {
+		Utilisateur user = utilisateurRepository.findByLogin(login.getLogin());
+		System.out.println(login);
+		if(user == null) return false;
+		return true;
+	}
 }
