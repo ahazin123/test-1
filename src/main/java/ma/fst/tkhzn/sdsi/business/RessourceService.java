@@ -350,7 +350,14 @@ public class RessourceService {
 			OrdinateurR ordr=new OrdinateurR(ord);
 			ordr.setQteD(qt);
 			ordr.setCode(i);
-			userRess.add(new UserRess(null, null, null, null,i,"ordinateur",ordr,null));
+			Departement Dep;
+			if(ord.getDep() == null) {
+				Dep = ord.getUser().getDepartement();
+			}
+			else {
+				Dep = departementRepository.getDepartement(ord.getDep());
+			}
+			userRess.add(new UserRess(null, null, null, null,i,"ordinateur",ordr,null, Dep.getNomDep()));
 			i = i + 1;
 		}
 		for(String key:imps.keySet()){
@@ -360,7 +367,14 @@ public class RessourceService {
 			ImprimanteR impr=new ImprimanteR(imp);
 			impr.setQteD(qt);
 			impr.setCode(i);
-			userRess.add(new UserRess(null, null, null, null, i,"imprimante",null,impr));
+			Departement Dep;
+			if(imp.getDep() == null) {
+				Dep = imp.getUser().getDepartement();
+			}
+			else {
+				Dep = departementRepository.getDepartement(imp.getDep());
+			}
+			userRess.add(new UserRess(null, null, null, null, i,"imprimante",null,impr, Dep.getNomDep()));
 			i = i + 1;
 		}
 

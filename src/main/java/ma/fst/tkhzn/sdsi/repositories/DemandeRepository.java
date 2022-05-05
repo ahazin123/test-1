@@ -12,10 +12,8 @@ import java.util.Date;
 import java.util.List;
 
 public interface DemandeRepository extends JpaRepository<Demande,Integer> {
-
-
-    @Query("select max(d.id) from Demande d ")
-    public Integer getId();
+    @Query(value = "select d.* from Demande d where d.valide=0 order by d.date desc limit 1", nativeQuery = true)
+    public Demande getId();
 
     @Query("select d from Demande d where d.valide = 0")
     public Demande find();

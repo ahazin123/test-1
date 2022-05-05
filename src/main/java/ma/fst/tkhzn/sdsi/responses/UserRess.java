@@ -22,4 +22,5 @@ public class UserRess implements Serializable {
     private String type;
     private OrdinateurR ord;
     private ImprimanteR imp;
+    private String dep;
 }

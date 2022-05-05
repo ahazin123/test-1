@@ -1,6 +1,7 @@
 package ma.fst.tkhzn.sdsi.business;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -101,17 +102,25 @@ public class UserService {
 
 	@RequestMapping(path = "/users", method = RequestMethod.GET)
 	public List<Utilisateur> users() {
-		return iUserRepository.findAll();
+		List<Utilisateur> usrs = new ArrayList<>();
+		List<String> login = new ArrayList<>();
+		for(Enseignant u: enseignantRepository.findAll()) usrs.add(new Enseignant(u));
+		for(Utilisateur u: iUserRepository.findAll()) {
+			if(!u.getRole().equalsIgnoreCase("fournisseur") && !login.contains(u.getLogin())) {
+				usrs.add(new Utilisateur(u));
+			}
+		}
+		return usrs;
 	}
 
 
 	@RequestMapping(path = "/adduser", method = RequestMethod.POST)
 	public CodeStatus addUser(@RequestBody UserRequest userReq) {
-
 		String role = userReq.getRole();
 		if(role == null) {
 			return new CodeStatus(300);
-		} else {
+		}
+		else {
 			if(role.equalsIgnoreCase("enseignant")) {
 				Enseignant ens = userReq.getEnseignant();
 				codePasswordAndActive(ens);
@@ -137,15 +146,6 @@ public class UserService {
 				iUserRepository.save(user);
 			}
 		}
-
-//		if(userReq.getUser().getRole().equals("Enseignant")) {
-//			Enseignant ens = userReq.getEnseignant();
-//			ens.setPwd(encoder.encode(ens.getPwd()));
-//			ens.setActive(true);
-//			ens.setNomLab(ens.getNomLab());
-//			enseignantRepository.save(ens);
-//			enseignantRepository.save(userReq.getEnseignant());
-//		}
 		return new CodeStatus(200);
 	}
 

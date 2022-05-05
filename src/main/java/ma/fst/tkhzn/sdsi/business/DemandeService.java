@@ -11,10 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.*;
 
-@RestController
+@RestController @CrossOrigin
 @RequestMapping(value = {"api/demandeservice"})
-@CrossOrigin
-
 public class DemandeService {
     @Autowired
     AppelOffreRep appelOffreRep;
@@ -30,26 +28,28 @@ public class DemandeService {
     UtilisateurRepository utilisateurRepository;
     @Autowired
     DemandeRepository demandeRepository;
+    @Autowired
+    DepartementRepository departementRepository;
 
     //chef au nom du depart terminer
     @RequestMapping(path = "/ajouterDemande", method = RequestMethod.POST)
     public void ajouterDemande(@RequestBody DemandeRequest demande,Principal login){
         Utilisateur user = utilisateurRepository.findByLogin(login.getName());
-        Integer d = demandeRepository.getId();
-        if(d == null || demandeRepository.findById(d).get().getValide() != 0) {
+        Demande d = demandeRepository.getId();
+        if(d == null) {
             demandeRepository.save(new Demande(null, 0, 0, new Date()));
             d = demandeRepository.getId();
         }
         if (demande.getType().equals("imprimante")){
             Imprimante_d imp = demande.getImprimante_d();
             imp.setDep(user.getDepartement().getId());
-            imp.setId_demande(d);
+            imp.setId_demande(d.getId());
             imprimate_dRepository.save(imp);
         }
         else {
             Ordinateur_d ord = demande.getOrdinateur_d();
             ord.setDep(user.getDepartement().getId());
-            ord.setId_demande(d);
+            ord.setId_demande(d.getId());
             ordinateur_dRepository.save(ord);
         }
     }
@@ -58,21 +58,21 @@ public class DemandeService {
     @RequestMapping(path = "/addDemande", method = RequestMethod.POST)
     public void addDemande(@RequestBody DemandeRequest demande,Principal login){
         Utilisateur user = utilisateurRepository.findByLogin(login.getName());
-        Integer d = demandeRepository.getId();
-        if(d == null || demandeRepository.findById(d).get().getValide() != 0) {
+        Demande d = demandeRepository.getId();
+        if(d == null) {
             demandeRepository.save(new Demande(null, 0, null, new Date()));
             d = demandeRepository.getId();
         }
         if (demande.getType().equals("imprimante")){
             Imprimante_d imp = demande.getImprimante_d();
             imp.setUser(user);
-            imp.setId_demande(d);
+            imp.setId_demande(d.getId());
             imprimate_dRepository.save(imp);
         }
         else {
             Ordinateur_d ord = demande.getOrdinateur_d();
             ord.setUser(user);
-            ord.setId_demande(d);
+            ord.setId_demande(d.getId());
             ordinateur_dRepository.save(ord);
         }
     }
@@ -110,13 +110,13 @@ public class DemandeService {
         for (Imprimante_d imp:imprimate_dRepository.findRess_d(user.getLogin())){
             if(imp.getChecked() == 0) {
                 ImprimanteR impr=new ImprimanteR(imp);
-                userRess.add(new UserRess("personnel", null, imp.getUser().getNom() + " " + imp.getUser().getPrenom(), imp.getUser().getLogin(),imp.getCode(),"imprimante",null, impr));
+                userRess.add(new UserRess("personnel", null, imp.getUser().getNom() + " " + imp.getUser().getPrenom(), imp.getUser().getLogin(),imp.getCode(),"imprimante",null, impr, null));
             }
         }
         for(Ordinateur_d ord:ordinateur_dRepository.findOrd_d(user.getLogin())){
             if(ord.getChecked() == 0) {
                 OrdinateurR ordr=new OrdinateurR(ord);
-                userRess.add(new UserRess("personnel", null, ord.getUser().getNom() + " " + ord.getUser().getPrenom(), ord.getUser().getLogin(),ord.getCode(),"ordinateur",ordr,null));
+                userRess.add(new UserRess("personnel", null, ord.getUser().getNom() + " " + ord.getUser().getPrenom(), ord.getUser().getLogin(),ord.getCode(),"ordinateur",ordr,null, null));
             }
         }
         return userRess;
@@ -132,13 +132,13 @@ public class DemandeService {
             for (Imprimante_d imp:imprimate_dRepository.findRess_d(usr.getLogin())){
                 if(imp.getChecked() == 0) {
                     ImprimanteR impr = new ImprimanteR(imp);
-                    userRess.add(new UserRess("personnel", null, imp.getUser().getNom() + " " + imp.getUser().getPrenom(), imp.getUser().getLogin(), imp.getCode(), "imprimante", null, impr));
+                    userRess.add(new UserRess("personnel", null, imp.getUser().getNom() + " " + imp.getUser().getPrenom(), imp.getUser().getLogin(), imp.getCode(), "imprimante", null, impr, null));
                 }
             }
             for(Ordinateur_d ord:ordinateur_dRepository.findOrd_d(usr.getLogin())){
                 if(ord.getChecked() == 0) {
                     OrdinateurR ordr = new OrdinateurR(ord);
-                    userRess.add(new UserRess("personnel", null, ord.getUser().getNom() + " " + ord.getUser().getPrenom(), ord.getUser().getLogin(), ord.getCode(), "ordinateur", ordr, null));
+                    userRess.add(new UserRess("personnel", null, ord.getUser().getNom() + " " + ord.getUser().getPrenom(), ord.getUser().getLogin(), ord.getCode(), "ordinateur", ordr, null, null));
                 }
             }
         }
@@ -147,13 +147,13 @@ public class DemandeService {
         for (Imprimante_d imp:imprimate_dRepository.findRess_dep(dep.getId())){
             if(imp.getChecked() == 0) {
                 ImprimanteR impr=new ImprimanteR(imp);
-                userRess.add(new UserRess("departement", dep.getId(), dep.getNomDep(), null, imp.getCode(),"imprimante",null, impr));
+                userRess.add(new UserRess("departement", dep.getId(), dep.getNomDep(), null, imp.getCode(),"imprimante",null, impr, null));
             }
         }
         for(Ordinateur_d ord:ordinateur_dRepository.findRess_dep(dep.getId())){
             if(ord.getChecked() == 0) {
                 OrdinateurR ordr=new OrdinateurR(ord);
-                userRess.add(new UserRess("departement", dep.getId(), dep.getNomDep(), null, ord.getCode(),"ordinateur",ordr,null));
+                userRess.add(new UserRess("departement", dep.getId(), dep.getNomDep(), null, ord.getCode(),"ordinateur", ordr,null, null));
             }
         }
 //        for(UserRess r: userRess) System.out.println(r);
@@ -163,7 +163,7 @@ public class DemandeService {
     public String ordToString(Ordinateur_d ord){
         return ord.getMarque()+" "+ord.getCpu()+" "+ord.getRam()+" "+ord.getDisque_d()+" "+ord.getEcran();
     }
-    public String impToString(Imprimante_d imp){
+    public String impToString(Imprimante_d imp) {
         return imp.getMarque()+" "+imp.getResolution()+" "+imp.getVitesse();
     }
 
@@ -175,47 +175,59 @@ public class DemandeService {
         List<UserRess> userRess=new ArrayList<>();
 
         Demande d = demandeRepository.find();
-
-        Ordinateur_d tmp=new Ordinateur_d();
-        for(Ordinateur_d ord:ordinateur_dRepository.listerRess_d(d.getId())){
-            if(ordToString(ord).equals(ordToString(tmp))){
-                ords.put(ordToString(ord),ords.get(ordToString(ord))+ord.getQteD());
-            }else {
-                ords.put(ordToString(ord),ord.getQteD());
+        if(d==null) System.out.println("null");
+        else {
+            Ordinateur_d tmp=new Ordinateur_d();
+            for(Ordinateur_d ord:ordinateur_dRepository.listerRess_d(d.getId())){
+                Long dep;
+                if(ord.getDep() == null) dep = ord.getUser().getDepartement().getId();
+                else dep = ord.getDep();
+                if(ordToString(ord).equals(ordToString(tmp))){
+                    ords.put(ordToString(ord) + " " + dep,ords.get(ordToString(ord) + " " + dep)+ord.getQteD());
+                }else {
+                    ords.put(ordToString(ord) + " " + dep,ord.getQteD());
+                }
+                tmp=ord;
             }
-            tmp=ord;
-        }
-        Imprimante_d t=new Imprimante_d();
-        for(Imprimante_d imp:imprimate_dRepository.listerRess_d(d.getId())){
-            if(impToString(imp).equals(impToString(t))){
-                imps.put(impToString(imp),imps.get(impToString(imp))+imp.getQteD());
-            }else {
-                imps.put(impToString(imp),imp.getQteD());
+            Imprimante_d t=new Imprimante_d();
+            for(Imprimante_d imp:imprimate_dRepository.listerRess_d(d.getId())){
+                Long dep;
+                if(imp.getDep() == null) dep = imp.getUser().getDepartement().getId();
+                else dep = imp.getDep();
+                if(impToString(imp).equals(impToString(t))){
+                    imps.put(impToString(imp) + " " + dep, imps.get(impToString(imp) + " " + dep)+imp.getQteD());
+                }else {
+                    imps.put(impToString(imp) + " " + dep, imp.getQteD());
+                }
+                t=imp;
             }
-            t=imp;
+
+            Long i=0L;
+            for(String key:ords.keySet()){
+                System.out.println(key);
+                int qt=ords.get(key);
+                String[] carat=key.split(" ");
+                Ordinateur_d ord=new Ordinateur_d(carat[1],Integer.parseInt(carat[3]),Float.parseFloat(carat[4]),carat[0],Integer.parseInt(carat[2]));
+                OrdinateurR ordr=new OrdinateurR(ord);
+                ordr.setQteD(qt);
+                ordr.setCode(i);
+                Departement Dep = departementRepository.getDepartement(Long.parseLong(carat[5]));
+                userRess.add(new UserRess(null, null, null, null,i,"ordinateur",ordr,null, Dep.getNomDep()));
+                i = i + 1;
+            }
+            for(String key:imps.keySet()){
+                int qt=imps.get(key);
+                String[] carat=key.split(" ");
+                Imprimante_d imp=new Imprimante_d(carat[0],Float.parseFloat(carat[1]),Float.parseFloat(carat[2]));
+                ImprimanteR impr=new ImprimanteR(imp);
+                impr.setQteD(qt);
+                impr.setCode(i);
+                Departement Dep = departementRepository.getDepartement(Long.parseLong(carat[3]));
+                userRess.add(new UserRess(null, null, null, null, i,"imprimante",null,impr, Dep.getNomDep()));
+                i = i + 1;
+            }
         }
 
-        Long i=0L;
-        for(String key:ords.keySet()){
-            int qt=ords.get(key);
-            String[] carat=key.split(" ");
-            Ordinateur_d ord=new Ordinateur_d(carat[1],Integer.parseInt(carat[3]),Float.parseFloat(carat[4]),carat[0],Integer.parseInt(carat[2]));
-            OrdinateurR ordr=new OrdinateurR(ord);
-            ordr.setQteD(qt);
-            ordr.setCode(i);
-            userRess.add(new UserRess(null, null, null, null,i,"ordinateur",ordr,null));
-            i = i + 1;
-        }
-        for(String key:imps.keySet()){
-            int qt=imps.get(key);
-            String[] carat=key.split(" ");
-            Imprimante_d imp=new Imprimante_d(carat[0],Float.parseFloat(carat[1]),Float.parseFloat(carat[2]));
-            ImprimanteR impr=new ImprimanteR(imp);
-            impr.setQteD(qt);
-            impr.setCode(i);
-            userRess.add(new UserRess(null, null, null, null, i,"imprimante",null,impr));
-            i = i + 1;
-        }
 
         for(UserRess r: userRess) System.out.println(r);
         return userRess;

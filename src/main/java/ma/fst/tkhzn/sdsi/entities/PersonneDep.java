@@ -18,17 +18,11 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class PersonneDep extends Utilisateur implements Serializable{
-	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	@ManyToOne
 	@JoinColumn(name="idDep", insertable=false,updatable=false )
 	private Departement departement;
-
-
 
 	public Departement getDepartement() {
 		return departement;
@@ -37,9 +31,6 @@ public class PersonneDep extends Utilisateur implements Serializable{
 	public void setDepartement(Departement departement) {
 		this.departement = departement;
 	}
-
-
-
 
 	public PersonneDep(String login, String nom, String prenom, String pwd, Boolean act, String role, Departement departement) {
 		super(login, nom, prenom, pwd, act, role);

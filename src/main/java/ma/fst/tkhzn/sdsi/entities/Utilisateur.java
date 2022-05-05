@@ -19,8 +19,7 @@ import lombok.ToString;
 
 @SuppressWarnings("unused")
 @Entity
-@Data @NoArgsConstructor 
-
+@Data
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Utilisateur implements UserDetails{
 	/**
@@ -37,9 +36,16 @@ public class Utilisateur implements UserDetails{
 	private String role;
 	private String ressetPasswordToken;
 
-//	@ManyToMany(mappedBy = "personnels")
-//	private Collection<Ressource> ressources=new ArrayList<>();
-//
+	@ManyToOne
+	@JoinColumn(name="idDep", insertable=false,updatable=false )
+	private Departement departement;
+
+	@OneToMany(mappedBy = "user",fetch = FetchType.EAGER)
+	private List<Ressource_d> ressource_ds ;
+
+	public Utilisateur() {
+	}
+
 	//constructeur
 	public Utilisateur(String login,  String nom, String prenom, String pwd,Boolean act,String role) {
 		super();
@@ -49,12 +55,8 @@ public class Utilisateur implements UserDetails{
 		this.pwd = pwd;
 		this.active=act;
 		this.role=role;
+		this.ressource_ds = new ArrayList<>();
 	}
-
-	@ManyToOne
-	@JoinColumn(name="idDep", insertable=false,updatable=false )
-	private Departement departement;
-
 	public String getLogin() {
 		return login;
 	}
@@ -65,8 +67,6 @@ public class Utilisateur implements UserDetails{
 		this.departement=user.getDepartement();
 		this.ressource_ds=new ArrayList<>();
 	}
-	@OneToMany(mappedBy = "user",fetch = FetchType.EAGER)
-	private List<Ressource_d> ressource_ds ;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
