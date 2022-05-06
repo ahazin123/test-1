@@ -1,45 +1,30 @@
 package ma.fst.tkhzn.sdsi.entities;
 
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
 import java.io.Serializable;
 @Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Offre implements Serializable {
-    @EmbeddedId
-    offreId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String fournisseur;
+    private Long groupe;
     private float prix_unit;
-    private int duree;
+    private int duree_garantie;
+    private int etat;
 
-    public Offre(offreId id, float prix_unit, int duree) {
-        this.id = id;
+    public Offre(String fournisseur, Long groupe, float prix_unit, int duree_garantie, int etat) {
+        this.fournisseur = fournisseur;
+        this.groupe = groupe;
         this.prix_unit = prix_unit;
-        this.duree = duree;
-    }
-
-    public Offre() {
-    }
-
-    public offreId getId() {
-        return id;
-    }
-
-    public float getPrix_unit() {
-        return prix_unit;
-    }
-
-    public int getDuree() {
-        return duree;
-    }
-
-    public void setId(offreId id) {
-        this.id = id;
-    }
-
-    public void setPrix_unit(float prix_unit) {
-        this.prix_unit = prix_unit;
-    }
-
-    public void setDuree(int duree) {
-        this.duree = duree;
+        this.duree_garantie = duree_garantie;
+        this.etat = etat;
     }
 }

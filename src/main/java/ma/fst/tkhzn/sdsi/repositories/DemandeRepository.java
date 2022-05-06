@@ -18,9 +18,15 @@ public interface DemandeRepository extends JpaRepository<Demande,Integer> {
     @Query("select d from Demande d where d.valide = 0")
     public Demande find();
 
+    @Query("select d from Demande d where d.valide = 1")
+    public List<Demande> findDemandeByvalide();
+
+    @Query("select d from Demande d where d.valide = 0")
+    public List<Demande> findDemande_appel();
+
     @Transactional
     @Modifying
-    @Query("update Demande d set d.id_appel=:x where d.id=:y")
+    @Query("update Demande d set d.id_appel=:x ,d.valide=1 where d.id=:y")
     public void setIdAppel(@Param("x")int id_appel,@Param("y")int id);
 
 }

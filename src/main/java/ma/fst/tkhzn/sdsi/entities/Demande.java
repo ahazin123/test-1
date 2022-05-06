@@ -6,12 +6,13 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Demande {
+public class Demande implements Serializable {
     @Id@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private Integer valide;

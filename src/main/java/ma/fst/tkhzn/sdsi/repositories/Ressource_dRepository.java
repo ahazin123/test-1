@@ -30,5 +30,10 @@ public interface Ressource_dRepository extends JpaRepository<Ressource_d, Long> 
     @Query("select r.code from Ressource_d r where r.checked=0")
     public List<Long> lister();
 
+    @Query("select r.code from Ressource_d r where r.groupe=:x")
+    public List<Long> getCodeByGroupe(@Param("x")Long groupe);
+
+    @Query("select r.groupe from Ressource_d r where r.code=:x")
+    public Long getGroupByCode(@Param("x")Long code);
 
 }

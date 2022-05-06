@@ -10,7 +10,7 @@ import java.io.Serializable;
 @Data @NoArgsConstructor @ToString
 public class Ressource_DR implements Serializable {
     private Long code;
-//    private UtilisateurR user;
+    private Long groupe;
     private int qteD;
     private int id_demande;
 
@@ -18,5 +18,10 @@ public class Ressource_DR implements Serializable {
         this.code = code;
         this.qteD = qteD;
         this.id_demande = id_demande;
+    }
+
+    public Ressource_DR(Long groupe, int qteD) {
+        this.groupe = groupe;
+        this.qteD = qteD;
     }
 }

@@ -3,6 +3,7 @@ package ma.fst.tkhzn.sdsi.business;
 import ma.fst.tkhzn.sdsi.entities.*;
 import ma.fst.tkhzn.sdsi.repositories.*;
 import ma.fst.tkhzn.sdsi.requests.DemandeRequest;
+import ma.fst.tkhzn.sdsi.requests.OffreRequest;
 import ma.fst.tkhzn.sdsi.requests.Validation;
 import ma.fst.tkhzn.sdsi.responses.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,10 @@ public class DemandeService {
     DemandeRepository demandeRepository;
     @Autowired
     DepartementRepository departementRepository;
+    @Autowired
+    OffreRepository offreRepository;
+    @Autowired
+    FournisseurRepository fournisseurRepository;
 
     //chef au nom du depart terminer
     @RequestMapping(path = "/ajouterDemande", method = RequestMethod.POST)
@@ -166,7 +171,6 @@ public class DemandeService {
     public String impToString(Imprimante_d imp) {
         return imp.getMarque()+" "+imp.getResolution()+" "+imp.getVitesse();
     }
-
     // terminer
     @RequestMapping(path = "/listerDemandes" ,method = RequestMethod.GET)
     public List<UserRess> listerDemandes(){
@@ -233,15 +237,126 @@ public class DemandeService {
         return userRess;
     }
 
-    // en cours valide=1 appel d'offre courante valide=2 livrée
+    // en cours //valide=1 appel d'offre courante valide=2 livrée
     @RequestMapping(path = "/addAppel", method = RequestMethod.GET)
     public void addAppel(){
         appelOffreRep.save(new AppelOffre());
         int id_Appel= appelOffreRep.getId();
-        List<Demande> ds=demandeRepository.findAll();
+        List<Demande> ds=demandeRepository.findDemande_appel();
         for (Demande d:ds){
             demandeRepository.setIdAppel(id_Appel,d.getId());
         }
     }
+
+    //lister ressources pour l'appel
+    @RequestMapping(path = "/listerRessources" ,method = RequestMethod.GET)
+    public List<RessourcesAppel> listerRessources(){
+        Map<String,Integer>  ords=new HashMap<>();
+        Map<String,Integer>  imps=new HashMap<>();
+        List<RessourcesAppel> ressourcesAppels=new ArrayList<>();
+        Long groupe = 0L;
+        List<Demande> demandes = demandeRepository.findDemandeByvalide();
+        for (Demande d:demandes) {
+            if (d == null) System.out.println("null");
+            else {
+                Ordinateur_d tmp = new Ordinateur_d();
+                for (Ordinateur_d ord : ordinateur_dRepository.listerRess_d(d.getId())) {
+
+                    if (ordToString(ord).equals(ordToString(tmp))) {
+                        ords.put(ordToString(ord)+" "+groupe, ords.get(ordToString(ord)+" "+groupe) + ord.getQteD());
+                        ordinateur_dRepository.setGroupe(groupe, ord.getCode());
+                    } else {
+                        groupe = groupe + 1;
+                        ords.put(ordToString(ord)+" "+groupe, ord.getQteD());
+                        ordinateur_dRepository.setGroupe(groupe, ord.getCode());
+                    }
+                    tmp = ord;
+                }
+                Imprimante_d t = new Imprimante_d();
+                groupe = groupe + 1;
+                for (Imprimante_d imp : imprimate_dRepository.listerRess_d(d.getId())) {
+                    Long dep;
+                    if (impToString(imp).equals(impToString(t))) {
+                        imps.put(impToString(imp)+" "+groupe, imps.get(impToString(imp)+" "+groupe) + imp.getQteD());
+                        imprimate_dRepository.setGroupe(groupe, imp.getCode());
+                    } else {
+
+                        groupe = groupe + 1;
+                        imps.put(impToString(imp)+" "+groupe, imp.getQteD());
+                        imprimate_dRepository.setGroupe(groupe, imp.getCode());
+                    }
+                    t = imp;
+                }
+
+                Long i = 0L;
+                for (String key : ords.keySet()) {
+                    String[] carat = key.split(" ");
+                    Ordinateur_d ord = new Ordinateur_d(carat[1], Integer.parseInt(carat[3]), Float.parseFloat(carat[4]), carat[0], Integer.parseInt(carat[2]));
+                    OrdinateurR ordr = new OrdinateurR(ord);
+                    ordr.setGroupe(Long.parseLong(carat[5]));
+                    ordr.setQteD(ords.get(key));
+                    ordr.setCode(i);
+                    ressourcesAppels.add(new RessourcesAppel(ordr, null));
+                    i = i + 1;
+                }
+                for (String key : imps.keySet()) {
+                    String[] carat = key.split(" ");
+                    Imprimante_d imp = new Imprimante_d(carat[0], Float.parseFloat(carat[1]), Float.parseFloat(carat[2]));
+                    ImprimanteR impr = new ImprimanteR(imp);
+                    impr.setGroupe(Long.parseLong(carat[3]));
+                    impr.setQteD(imps.get(key));
+                    impr.setCode(i);
+                    ressourcesAppels.add(new RessourcesAppel(null, impr));
+                    i = i + 1;
+                }
+            }
+        }
+        return ressourcesAppels;
+    }
+
+   //enregistrer offre-->en cours etat=0
+    @RequestMapping(path = "/saveOffre" ,method = RequestMethod.POST)
+    public void saveOffre(@RequestBody List<OffreRequest> offreRequests){
+        for (OffreRequest offreRequest:offreRequests) {
+                offreRepository.save(new Offre(offreRequest.getFournisseur(), offreRequest.getGroupe(), offreRequest.getPrix_unit(), offreRequest.getDuree_garantie(),0));
+            }
+        }
+
+
+    //lister offres etat=0
+    @RequestMapping(path = "/listerOffres" ,method = RequestMethod.GET)
+    public Map<Fournisseur,List<OffreResponse>> listerOffres(){
+        List<Offre> offres=offreRepository.getOffreByEtat();
+        Map<Fournisseur,List<OffreResponse>>  offreResponses=new HashMap<>();
+        List<OffreResponse> list = new ArrayList<>();
+        String fournisseur = " ";
+        for (Offre offre:offres){
+            if(fournisseur.equals(offre.getFournisseur())){
+                list.add(new OffreResponse(offre.getGroupe(),offre.getPrix_unit(),offre.getDuree_garantie()));
+                offreResponses.replace(fournisseurRepository.findByLogin(offre.getFournisseur()),list);
+            }else {
+                list = new ArrayList<>();
+                list.add(new OffreResponse(offre.getGroupe(),offre.getPrix_unit(),offre.getDuree_garantie()));
+                offreResponses.put(fournisseurRepository.findByLogin(offre.getFournisseur()),list);
+                fournisseur = offre.getFournisseur();
+            }
+        }
+        return offreResponses;
+    }
+
+    //choix offre par fournisseur: choisis-->etat=1 autres-->etat=-1
+    @RequestMapping(path = "/choixOffre" ,method = RequestMethod.POST)
+    public void choixOffre(@RequestBody FournisseurResponse fournisseur){
+        List<Offre> offres = offreRepository.getOffreByEtat();
+        for (Offre offre:offres){
+            if(offre.getFournisseur().equals(fournisseur.getFournisseur()))
+                offreRepository.setEtat(1, offre.getId());
+            else
+                offreRepository.setEtat(-1, offre.getId());
+        }
+    }
+
+
+
 }
 
